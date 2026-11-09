@@ -1,250 +1,238 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#0b1118">
-    <meta name="description" content="Aldryl Labaguis’s JRU e-portfolio: programming coursework, learning milestones, projects, and term reflections.">
-    <meta property="og:title" content="Aldryl Labaguis">
-    <meta property="og:description" content="Student programming portfolio and academic works">
-    <title>Aldryl Labaguis</title>
-    <link rel="stylesheet" href="styles.css?v=20261028-titlefix3">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="portfolio-refresh.css?v=20261102">
-    <script defer src="site.js">
-    </script>
-  </head>
-  <body>
-    <a class="skip" href="#home">Skip to content</a>
-    <header class="top">
-      <div class="wrap top-inner">
-        <a class="logo" href="#home">
-          <span class="logo-box">AL.</span> Aldryl<span class="accent">.dev</span>
-        </a>
-        <nav id="nav" aria-label="Main navigation">
-          <a href="#home">Home</a><a href="#about">About</a><a href="#academics">Academic Work</a><a href="#experience">Journey</a><a href="#reflections">Reflections</a><a href="#contact">Contact</a>
-        </nav>
-        <div class="nav-actions">
-          <button id="theme" aria-label="Toggle theme">☀</button>
-          <button id="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090e12">
+  <meta name="description" content="Aldryl Labaguis — student developer at Jose Rizal University. Explore academic work, code experiments, projects in progress and reflections.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Aldryl Labaguis — Student Developer">
+  <meta property="og:description" content="Ideas into interfaces. A student developer's journey through code at Jose Rizal University.">
+  <title>Aldryl Labaguis — Developer Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="showcase.css?v=20261109-studio1">
+  <script defer src="showcase.js?v=20261109-studio1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a class="brand" href="#home" aria-label="Aldryl Labaguis, back to top">
+        <span class="brand-mark">AL.</span>
+        <span>aldryl<span class="brand-sub">/dev</span></span>
+      </a>
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#home" class="active">Home</a>
+        <a href="#about">About</a>
+        <a href="#academics">Work</a>
+        <a href="#experience">Journey</a>
+        <a href="#reflections">Reflections</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Light mode">☼</button>
+        <a class="header-cta" href="#contact">Let's connect <span aria-hidden="true">↗</span></a>
+        <button class="icon-btn menu-toggle" id="menu-toggle" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#academics">Academic work</a>
+      <a href="#experience">Journey</a>
+      <a href="#beyond">Beyond the classroom</a>
+      <a href="#reflections">Reflections</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <span class="eyebrow">JRU STUDENT DEVELOPER / 2026</span>
+          <h1 class="hero-title" id="hero-title"><span>Aldryl</span><span class="last-name">Labaguis.</span></h1>
+          <p class="hero-lead">Curious mind. Creative code.<br>Always building forward.</p>
+          <p class="hero-desc">I'm an IT student at Jose Rizal University, exploring programming, thoughtful interfaces and the art of turning ideas into something real.</p>
+          <div class="hero-buttons">
+            <a href="#academics" class="btn btn-accent">Explore my work <span class="btn-arrow" aria-hidden="true">↗</span></a>
+            <a href="#about" class="btn btn-outline">A little about me <span class="btn-arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <a class="hero-scroll" href="#about"><span class="scroll-line" aria-hidden="true"></span>SCROLL TO EXPLORE ↓</a>
+        </div>
+
+        <div class="visual" id="hero-visual" aria-label="Illustrated code-editor graphic">
+          <div class="visual-glow" aria-hidden="true"></div>
+          <div class="visual-ring" aria-hidden="true"></div>
+          <div class="editor" id="code-editor" aria-hidden="true">
+            <div class="editor-top">
+              <i class="editor-dot"></i><i class="editor-dot"></i><i class="editor-dot"></i>
+              <span class="editor-filename">about-me.js</span>
+            </div>
+            <div class="editor-body">
+              <div class="code-line"><span class="line-no">01</span><span><span class="syntax-purple">const</span> <span class="syntax-blue">developer</span> = {</span></div>
+              <div class="code-line"><span class="line-no">02</span><span class="code-indent">name: <span class="syntax-orange">'Aldryl Labaguis'</span>,</span></div>
+              <div class="code-line"><span class="line-no">03</span><span class="code-indent">school: <span class="syntax-orange">'JRU'</span>,</span></div>
+              <div class="code-line"><span class="line-no">04</span><span class="code-indent">passion: [</span></div>
+              <div class="code-line"><span class="line-no">05</span><span class="code-indent2"><span class="syntax-orange">'programming'</span>,</span></div>
+              <div class="code-line"><span class="line-no">06</span><span class="code-indent2"><span class="syntax-orange">'web design'</span>,</span></div>
+              <div class="code-line"><span class="line-no">07</span><span class="code-indent2"><span class="syntax-orange">'learning'</span></span></div>
+              <div class="code-line"><span class="line-no">08</span><span class="code-indent">],</span></div>
+              <div class="code-line"><span class="line-no">09</span><span class="code-indent">mindset: <span class="syntax-green">'keep building'</span></span></div>
+              <div class="code-line"><span class="line-no">10</span><span>};</span></div>
+            </div>
+            <div class="editor-footer">
+              <span class="editor-live"><i class="pulse-dot"></i> ALWAYS LEARNING</span>
+              <span>UTF-8 · JAVASCRIPT</span>
+            </div>
+          </div>
+          <div class="floating-note" aria-hidden="true"><strong>Progress, not perfection.</strong><small>one commit at a time ↗</small></div>
         </div>
       </div>
-    </header>
-    <main>
-      <section class="hero wrap" id="home">
-        <div class="hero-content">
-          <div class="status">● JRU STUDENT PORTFOLIO / 2026</div>
-          <div class="eyebrow">hello everyone, I'm</div>
-          <h1 class="portfolio-title">
-            <span class="title-name" style="display:block">Aldryl</span>
-            <span class="title-kind" style="display:block;white-space:nowrap;font-size:clamp(2.1rem,5vw,4.5rem);line-height:1.12;color:var(--accent)">Labaguis</span>
-          </h1>
-          <h2>IT Student & Aspiring Developer</h2>
-          <p class="typing">
-            <span id="typing">Learning through code</span>
-            <span class="cursor">▍</span>
-          </p>
-          <p>An evolving collection of programming activities, small experiments, and lessons learned while studying at Jose Rizal University.</p>
-          <div class="actions">
-            <a class="btn primary" href="#academics">View my work ↗</a>
-            <a class="btn" href="#reflections">Read reflections ↗</a>
-            <a class="btn" href="#contact">Get in touch ↗</a>
-          </div>
-          <a class="scroll" href="#about">SCROLL TO EXPLORE ↓</a>
+    </section>
+
+    <div class="strip" aria-label="Current learning interests">
+      <div class="container strip-inner">
+        <span class="strip-label">CURRENTLY EXPLORING</span>
+        <div class="strip-items" aria-hidden="true">
+          <span>JAVA</span><span>HTML / CSS</span><span>WEB DESIGN</span><span>PROBLEM SOLVING</span>
         </div>
-        <div class="hero-graphic" aria-hidden="true">
-          <div class="orb orb1">
-          </div>
-          <div class="orb orb2">
-          </div>
-          <div class="code-symbol">&lt;<span>A</span>/&gt;</div>
-          <span class="float f1">const creativity = true;</span>
-          <span class="float f2">// build something great_</span>
+      </div>
+    </div>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="container">
+        <div class="section-top reveal">
+          <div><span class="section-kicker">01 / THE HUMAN BEHIND THE CODE</span><h2 class="section-title" id="about-title">Get to know <em>me.</em></h2></div>
+          <p class="section-intro">A bit of my background, the things I'm learning and the mindset I bring to every new challenge.</p>
         </div>
-      </section>
-      <section class="section" id="about">
-        <div class="wrap">
-          <div class="section-head">
-            <span>01 / ABOUT</span>
-            <h2>About me<span class="accent">.</span>
-            </h2>
-            <p>My background, skills, and what drives me.</p>
+        <div class="about-layout">
+          <div class="avatar-panel reveal" role="img" aria-label="Abstract AL monogram illustration; not a photograph">
+            <span class="avatar-top">ABOUT THE DEVELOPER / 001</span>
+            <span class="avatar-monogram" aria-hidden="true">AL</span>
+            <span class="avatar-bottom">LEARN · CREATE · REPEAT</span>
           </div>
-          <div class="about-grid">
-            <div class="portrait">
-              <div class="portrait-fallback" role="img" aria-label="Abstract initials illustration, not a portrait"><small>ILLUSTRATED PROFILE</small></div>
-            </div>
-            <div>
-              <h3 class="large">Building things that <span class="accent">matter.</span>
-              </h3>
-              <p>I'm Aldryl, a student at Jose Rizal University exploring programming, problem-solving, and the process of building digital projects. This portfolio records coursework, ideas, and learning experiences. It will grow with verified work, finished projects, and reflections from each term.</p>
-              <div class="facts">
-                <div>
-                  <small>UNIVERSITY</small>
-                  <strong>Jose Rizal University</strong>
-                </div>
-                <div>
-                  <small>COURSE</small>
-                  <strong>Computer Programming 1</strong>
-                </div>
-                <div>
-                  <small>PROGRAM</small>
-                  <strong>Computer Programming 1</strong>
-                </div>
-                <div>
-                  <small>YEAR LEVEL</small>
-                  <strong>Academic portfolio / 2026</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-          <h3 class="subheading">Technical toolkit</h3>
-          <div class="grid grid3" id="skills">
-          </div>
-        </div>
-      </section>
-      <section class="section alt" id="academics">
-        <div class="wrap">
-          <div class="section-head">
-            <span>02 / ACADEMICS</span>
-            <h2>Academics & relevant works<span class="accent">.</span>
-            </h2>
-            <p>Course submissions, learning activities and project concepts. Documents will be added as they become available.</p>
-          </div>
-          <div class="grid grid3">
-            <article class="card doc">
-              <h3>▧ Compiled PTs & Products</h3>
-              <p>Machine problems, seatwork, recitations, performance tasks and activities.</p>
-              <div class="filebox" data-file="assets/docs/cp1-compiled-works.pdf">Academic files not uploaded yet</div>
-            </article>
-            <article class="card doc">
-              <h3>▧ Project Documentation</h3>
-              <p>Project report and supporting documentation (if applicable).</p>
-              <div class="filebox" data-file="assets/docs/project-documentation.pdf">Project files not uploaded yet</div>
-            </article>
-            <article class="card doc">
-              <h3>▷ Video Presentation</h3>
-              <p>Video presentation or demonstration (if applicable).</p>
-              <div class="filebox">A project presentation can be added when available.</div>
-              <div id="video">
-              </div>
-            </article>
-          </div>
-          <h3 class="subheading">Selected projects</h3>
-          <div class="grid grid3" id="projects">
-          </div>
-        </div>
-      </section>
-      <section class="section" id="experience">
-        <div class="wrap">
-          <div class="section-head">
-            <span>03 / EXPERIENCE</span>
-            <h2>Learning journey<span class="accent">.</span>
-            </h2>
-            <p>A timeline of schoolwork, practice and skills in progress — not a claim of employment.</p>
-          </div>
-          <div class="timeline" id="experience-list">
-          </div>
-        </div>
-      </section>
-      <section class="section alt" id="seminars">
-        <div class="wrap">
-          <div class="section-head">
-            <span>04 / SEMINARS</span>
-            <h2>Seminars & trainings<span class="accent">.</span>
-            </h2>
-            <p>Learning beyond the classroom.</p>
-          </div>
-          <div class="grid grid3">
-            <div class="card pad">
-              <span class="mini">TO BE DOCUMENTED</span>
-              <h3>Seminars & learning events</h3>
-              <p>Add confirmed seminar details, dates and supporting records here.</p>
+          <div class="reveal">
+            <h3 class="about-subtitle">More than just lines<br>of code<span style="color:var(--accent)">.</span></h3>
+            <p class="about-copy">Hey, I'm Aldryl — a student at Jose Rizal University with a growing interest in programming and building useful digital experiences. I enjoy learning how things work, solving problems piece by piece and experimenting with what I can create on the web.</p>
+            <p class="about-copy">This portfolio captures the process: coursework, early concepts, lessons learned and work that I'll continue to improve. Every great project starts somewhere.</p>
+            <div class="facts">
+              <div class="fact"><small>UNIVERSITY</small><strong>Jose Rizal University</strong></div>
+              <div class="fact"><small>LEARNING FOCUS</small><strong>Computer Programming 1</strong></div>
+              <div class="fact"><small>INTERESTS</small><strong>Development &amp; UI design</strong></div>
+              <div class="fact"><small>STATUS</small><strong>Learning &amp; building · 2026</strong></div>
             </div>
           </div>
         </div>
-      </section>
-      <section class="section" id="organizations">
-        <div class="wrap">
-          <div class="section-head">
-            <span>05 / ORGANIZATIONS</span>
-            <h2>Community involvement<span class="accent">.</span>
-            </h2>
-            <p>Groups and communities I've contributed to.</p>
-          </div>
-          <div class="grid grid3">
-            <div class="card pad">
-              <span class="mini">TO BE DOCUMENTED</span>
-              <h3>Organizations & involvement</h3>
-              <p>Add verified activities, memberships and contributions here.</p>
-            </div>
-          </div>
+        <div class="subhead-row"><h3>My growing toolkit</h3></div>
+        <div class="skill-grid" id="skills" aria-label="Technical toolkit"></div>
+      </div>
+    </section>
+
+    <section class="section" id="academics" aria-labelledby="academics-title">
+      <div class="container">
+        <div class="section-top reveal">
+          <div><span class="section-kicker">02 / SELECTED WORK</span><h2 class="section-title" id="academics-title">Learning by <em>doing.</em></h2></div>
+          <p class="section-intro">A curated look at my academic work, design explorations and things currently taking shape.</p>
         </div>
-      </section>
-      <section class="section alt" id="awards">
-        <div class="wrap">
-          <div class="section-head">
-            <span>06 / AWARDS</span>
-            <h2>Awards & recognition<span class="accent">.</span>
-            </h2>
-            <p>Highlights, achievements and milestones.</p>
-          </div>
-          <div class="grid grid3">
-            <div class="card pad">
-              <span class="mini">TO BE DOCUMENTED</span>
-              <h3>Milestones & recognition</h3>
-              <p>Add confirmed achievements and award documentation here.</p>
-            </div>
-          </div>
+        <div class="subhead-row"><h3>Academic resources</h3></div>
+        <div class="docs-grid">
+          <article class="doc-card reveal">
+            <span class="card-kicker">COURSEWORK / 01</span><span class="doc-symbol" aria-hidden="true">⌘</span>
+            <h3>Compiled activities</h3>
+            <p>Programming exercises, machine problems, seatwork and performance tasks.</p>
+            <div class="doc-status" data-doc="assets/docs/cp1-compiled-works.pdf">DOCUMENT UPLOAD PENDING</div>
+          </article>
+          <article class="doc-card reveal">
+            <span class="card-kicker">DOCUMENTATION / 02</span><span class="doc-symbol" aria-hidden="true">≡</span>
+            <h3>Project documentation</h3>
+            <p>Supporting reports, process notes and screenshots as projects are completed.</p>
+            <div class="doc-status" data-doc="assets/docs/project-documentation.pdf">DOCUMENT UPLOAD PENDING</div>
+          </article>
+          <article class="doc-card reveal">
+            <span class="card-kicker">PRESENTATION / 03</span><span class="doc-symbol" aria-hidden="true">▷</span>
+            <h3>Video presentations</h3>
+            <p>A future home for verified project walkthroughs and academic demonstrations.</p>
+            <div class="doc-status">VIDEO UPLOAD PENDING</div>
+          </article>
         </div>
-      </section>
-      <section class="section" id="other">
-        <div class="wrap">
-          <div class="section-head">
-            <span>07 / OTHER</span>
-            <h2>Other information<span class="accent">.</span>
-            </h2>
-            <p>Additional experiences and growth at JRU.</p>
-          </div>
-          <div class="card pad">
-            <h3>My JRU experience</h3>
-            <p>Personal school experiences and lessons can be included as this portfolio develops.</p>
-          </div>
+        <div class="subhead-row"><h3>Projects &amp; explorations</h3></div>
+        <div class="projects-grid" id="projects" aria-label="Project concepts"></div>
+      </div>
+    </section>
+
+    <section class="section" id="experience" aria-labelledby="journey-title">
+      <div class="container">
+        <div class="section-top reveal">
+          <div><span class="section-kicker">03 / THE JOURNEY SO FAR</span><h2 class="section-title" id="journey-title">Built on <em>curiosity.</em></h2></div>
+          <p class="section-intro">My learning path is still unfolding. Here are the foundations I'm developing and where I'm headed next.</p>
         </div>
-      </section>
-      <section class="section alt" id="reflections">
-        <div class="wrap">
-          <div class="section-head">
-            <span>08 / REFLECTIONS</span>
-            <h2>Term reflections<span class="accent">.</span>
-            </h2>
-            <p>Three distinct term narratives for Computer Programming 1.</p>
-          </div>
-          <div class="grid grid3" id="reflection-list">
-          </div>
+        <div class="timeline" id="experience-list" aria-label="Academic learning timeline"></div>
+      </div>
+    </section>
+
+    <section class="section" id="beyond" aria-labelledby="beyond-title">
+      <div class="container">
+        <div class="section-top reveal">
+          <div><span class="section-kicker">04 / THE BIGGER PICTURE</span><h2 class="section-title" id="beyond-title">Beyond the <em>screen.</em></h2></div>
+          <p class="section-intro">A growing record of experiences, community, achievements and moments outside regular coursework.</p>
         </div>
-      </section>
-      <section class="section" id="contact">
-        <div class="wrap">
-          <div class="section-head">
-            <span>09 / CONTACT</span>
-            <h2>Let's connect<span class="accent">.</span>
-            </h2>
-            <p>Browse academic work and connect when verified contact details are available.</p>
-          </div>
-          <div class="contact-grid">
-            <div><h3 class="large">More to come<span class="accent">.</span></h3><p>Contact details will appear here after they are confirmed by the portfolio owner. In the meantime, explore the academic work featured on this website.</p><a class="btn primary" href="#academics">View academic work ↗</a></div>
-            <div class="contact-note"><strong>Portfolio in progress</strong><p>Academic outputs, reflections, achievements and personal contact information can be added without redesigning the page.</p><a href="#academics">Back to academic work →</a></div>
-          </div>
+        <div class="bento-grid">
+          <article class="bento-card reveal" id="seminars">
+            <span class="mini-tag">01 / SEMINARS &amp; TRAININGS</span><span class="big-icon" aria-hidden="true">✳</span>
+            <h3>Never stop learning.</h3>
+            <p>Verified seminars, workshops and learning events will appear here as they are documented.</p>
+          </article>
+          <article class="bento-card reveal" id="organizations">
+            <span class="mini-tag">02 / COMMUNITY</span><span class="big-icon" aria-hidden="true">◎</span>
+            <h3>Better together.</h3>
+            <p>A future space for student organizations, collaboration and community involvement.</p>
+          </article>
+          <article class="bento-card reveal" id="awards">
+            <span class="mini-tag">03 / MILESTONES</span><span class="big-icon" aria-hidden="true">✦</span>
+            <h3>Every step counts.</h3>
+            <p>A place for confirmed achievements, recognition and meaningful milestones.</p>
+          </article>
+          <article class="bento-card reveal" id="other">
+            <span class="mini-tag">04 / MORE ABOUT JRU</span><span class="big-icon" aria-hidden="true">↗</span>
+            <h3>More than coursework.</h3>
+            <p>Memorable experiences and insights from my time at Jose Rizal University.</p>
+          </article>
         </div>
-      </section>
-    </main>
-  <footer>
-    <div class="wrap foot">
-      <span>© 2026 Aldryl Labaguis — E-Portfolio.</span>
-      <span>INDEPENDENT PORTFOLIO EDITION</span>
-      <a href="#home">BACK TO TOP ↑</a>
+      </div>
+    </section>
+
+    <section class="section" id="reflections" aria-labelledby="reflections-title">
+      <div class="container">
+        <div class="section-top reveal">
+          <div><span class="section-kicker">05 / WORDS &amp; GROWTH</span><h2 class="section-title" id="reflections-title">Lessons along <em>the way.</em></h2></div>
+          <p class="section-intro">Three chapters of my Computer Programming 1 journey. Personal reflections will be added as the written work is finalized.</p>
+        </div>
+        <div class="reflections-grid" id="reflection-list" aria-label="Term reflection guides"></div>
+      </div>
+    </section>
+
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="contact-panel reveal">
+          <span class="section-kicker">06 / KEEP EXPLORING</span>
+          <h2 id="contact-title">The best is<br>yet to be built.</h2>
+          <p>This is only the beginning of my developer journey. More projects, real work and ways to get in touch are coming as the portfolio grows.</p>
+          <a class="btn" href="#academics">Explore the work <span class="btn-arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#home"><span class="brand-mark">AL.</span><span>aldryl<span class="brand-sub">/dev</span></span></a>
+      <p>© 2026 Aldryl Labaguis. Designed with curiosity.</p>
+      <span class="footer-caps">JRU / PHILIPPINES</span>
+      <a class="back-to-top" href="#home">BACK TO TOP ↑</a>
     </div>
   </footer>
 </body>
