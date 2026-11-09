@@ -1,4 +1,5 @@
 'use strict';
+document.documentElement.classList.add('has-js');
 
 /* Portfolio content is deliberately honest: unfinished work stays labeled as in progress. */
 const skillGroups = [
@@ -216,9 +217,3 @@ document.querySelectorAll('[data-doc]').forEach(async el=>{
   }catch(error){/* Placeholder remains informative when docs aren't uploaded. */}
 });
 
-const words=['Learning through code.','Exploring thoughtful interfaces.','Growing one project at a time.'];
-const typeEl=$('rotating-line');
-if(typeEl&&motionOK){
-  let index=0;
-  window.setInterval(()=>{index=(index+1)%words.length;typeEl.textContent=words[index]},3800);
-}
