@@ -13,7 +13,7 @@
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createRavenSidePose } from './raven-flight-pose.js?v=20261109-gif-sync8';
+import { createRavenSidePose } from './raven-flight-pose.js?v=20261109-raven-v9';
 
 const holder = document.getElementById('aldryl-raven');
 if (holder) {
@@ -77,14 +77,25 @@ if (holder) {
   };
   let beatPose={wing:.98,side:0,lean:0};
   function sampleReferencePose(seconds){
-    const f=((seconds/referenceCycleSeconds)%1+1)%1*referencePoses.length;
-    const i=Math.floor(f);
-    const a=referencePoses[i],b=referencePoses[(i+1)%referencePoses.length];
-    const t=smooth01(f-i);
+    const count=referencePoses.length;
+    const frame=((seconds/referenceCycleSeconds)%1+1)%1*count;
+    const i=Math.floor(frame), t=frame-i;
+    // Looping Catmull–Rom: continuous velocity at frame boundaries. The old
+    // smoothstep made the raven momentarily stop every 120ms and look robotic.
+    const interpolation=key=>{
+      const p0=referencePoses[(i+count-1)%count][key];
+      const p1=referencePoses[i][key];
+      const p2=referencePoses[(i+1)%count][key];
+      const p3=referencePoses[(i+2)%count][key];
+      const t2=t*t,t3=t2*t;
+      const value=.5*(2*p1+(-p0+p2)*t+
+        (2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3);
+      return clamp(value,-1,1);
+    };
     return {
-      wing:a.wing+(b.wing-a.wing)*t,
-      side:a.side+(b.side-a.side)*t,
-      lean:a.lean+(b.lean-a.lean)*t
+      wing:interpolation('wing'),
+      side:interpolation('side'),
+      lean:interpolation('lean')
     };
   }
 
