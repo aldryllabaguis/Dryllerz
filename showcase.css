@@ -228,3 +228,60 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
   html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .reveal{opacity:1;transform:none}
 }
+
+
+/* Precision journey rail — adapted from the JRU portfolio's scroll-synced red timeline.
+   A geometric track and a progress beam use the same reading position as the milestone dots. */
+.timeline{
+  --timeline-progress:0;
+  position:relative;
+  isolation:isolate;
+  border-left:0;
+  margin-left:10px;
+  padding-left:40px;
+}
+.timeline::before,.timeline::after{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  pointer-events:none;
+}
+.timeline::before{width:1px;background:var(--stroke)}
+.timeline::after{
+  width:2px;
+  left:-.5px;
+  z-index:1;
+  background:linear-gradient(to bottom,rgba(255,59,29,.6),var(--accent) 85%,#ff6a3d);
+  box-shadow:0 0 5px rgba(255,59,29,.30);
+  transform:scaleY(var(--timeline-progress,0));
+  transform-origin:top center;
+  transition:none;
+  will-change:transform;
+}
+.timeline-item{z-index:2;min-width:0}
+.timeline-item::before{content:none}
+.timeline-dot{
+  position:absolute;
+  top:5px;
+  left:-47px;
+  width:13px;
+  height:13px;
+  border:2px solid var(--accent);
+  border-radius:50%;
+  background:var(--surface);
+  z-index:3;
+  transition:background-color .16s ease,box-shadow .16s ease,transform .22s ease;
+}
+.timeline-item.is-passed .timeline-dot{
+  background:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+.timeline-item:hover .timeline-dot{transform:scale(1.13)}
+@media(max-width:620px){
+  .timeline{padding-left:24px}
+  .timeline-dot{left:-31px}
+}
+@media(prefers-reduced-motion:reduce){
+  .timeline::after{transform:scaleY(1);box-shadow:none;will-change:auto}
+  .timeline-dot{background:var(--accent);transition:none}
+}
