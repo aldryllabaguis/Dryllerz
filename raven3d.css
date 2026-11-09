@@ -70,3 +70,7 @@
 @media(prefers-reduced-motion:reduce){
   .raven-companion canvas{transition:none!important}
 }
+
+/* Preserve headline readability as the decorative bird roams the hero.
+   Header/navigation already stay above the bird; prioritize the intro too. */
+.hero-content{position:relative;z-index:61}
