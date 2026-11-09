@@ -56,6 +56,38 @@ if (holder) {
   let profileOpacity=0;
   let horizontalFacing=1;
 
+  // The approved uploaded GIF is 8 frames at 120 ms each (960 ms/loop).
+  // These poses follow the actual illustrated sequence: front wings high,
+  // turning through 3/4 view, side-profile high/downstroke, back to front.
+  // Frames describe motion only; all artwork remains independently rigged 3D.
+  const referenceCycleSeconds=0.96;
+  const referencePoses=[
+    {wing:.98,side:0.00,lean:0.00},
+    {wing:.64,side:.24,lean:-.08},
+    {wing:.54,side:.87,lean:-.12},
+    {wing:.99,side:1.00,lean:0.02},
+    {wing:-.94,side:1.00,lean:0.13},
+    {wing:-.76,side:.75,lean:0.10},
+    {wing:.49,side:.14,lean:-.03},
+    {wing:.94,side:0.00,lean:0.00}
+  ];
+  const smooth01 = value => {
+    const v=clamp(value,0,1);
+    return v*v*(3-2*v);
+  };
+  let beatPose={wing:.98,side:0,lean:0};
+  function sampleReferencePose(seconds){
+    const f=((seconds/referenceCycleSeconds)%1+1)%1*referencePoses.length;
+    const i=Math.floor(f);
+    const a=referencePoses[i],b=referencePoses[(i+1)%referencePoses.length];
+    const t=smooth01(f-i);
+    return {
+      wing:a.wing+(b.wing-a.wing)*t,
+      side:a.side+(b.side-a.side)*t,
+      lean:a.lean+(b.lean-a.lean)*t
+    };
+  }
+
   try {
     renderer = new THREE.WebGLRenderer({
       alpha:true,antialias:true,powerPreference:'high-performance'
@@ -197,44 +229,47 @@ if (holder) {
     const speed=norm(agent.vx,agent.vy);
     const dx=speed>1?agent.vx/speed:0;
     const dy=speed>1?agent.vy/speed:0;
-    const smooth=1-Math.exp(-dt*4.6);
-    // Ornithology-inspired: deliberate, asymmetric wingbeats with short gliding
-    // intervals. Slightly faster than the earlier 3D preview (about 1.5 Hz).
-    const cycle=(elapsed*1.72)%1;
-    const phase=cycle*Math.PI*2-.25;
-    const wave=Math.sin(phase);
-    const asymmetric=wave>=0
-      ? Math.pow(wave,.72)
-      : -.84*Math.pow(-wave,1.22);
-    const glideWindow=(elapsed%6.2)>5.6;
-    // Glide cycles are brief and less forceful; the bird keeps its wings open
-    // instead of snapping them shut. The same 1.72 Hz phase drives both rigs.
-    const glideFactor=glideWindow?1:0;
-    const amplitude=motionDisabled?0:(glideWindow?.12:.91);
-    const beat=asymmetric*amplitude;
-    sidePose.flap(elapsed,phase,glideFactor);
+    const hovering=motionDisabled || elapsed<hoverUntil ||
+      (speed<16 && (!lure || elapsed>=lure.until));
+    const pose=sampleReferencePose(elapsed);
+    const intensity=hovering ? 0 : smooth01((speed-12)/58);
+    // In a still hover the front reference remains open-winged, with barely
+    // perceptible living motion; active flight follows the 8 reference frames.
+    beatPose={
+      wing:(1-intensity)*(.92+.014*Math.sin(elapsed*1.9))+
+        intensity*pose.wing,
+      side: intensity*pose.side,
+      lean: intensity*pose.lean
+    };
+    const glide=(elapsed%6.4)>5.95? .75:0; // short, natural intermittent glide
+    sidePose.flap(elapsed,beatPose.wing,glide);
     for(const side of [-1,1]){
-      const part=joints[side===-1?'LeftWing':'RightWing'];
-      const base=basePose[side===-1?'LeftWing':'RightWing'];
+      const name=side<0?'LeftWing':'RightWing';
+      const part=joints[name],base=basePose[name];
       if(!part||!base)continue;
-      part.rotation.z=base.z+side*(.08+beat*.28);
-      part.rotation.y=base.y+side*(.12+beat*.50);
-      part.rotation.x=base.x+beat*.065;
+      const wing=beatPose.wing*(1-glide*.45);
+      // Hinge rotation is mirrored so both wings rise together.
+      part.rotation.z=base.z+side*(.075+wing*.30);
+      part.rotation.y=base.y+side*(.10+wing*.42);
+      part.rotation.x=base.x+wing*.08;
     }
     if(joints.Tail&&basePose.Tail){
-      joints.Tail.rotation.z=basePose.Tail.z+Math.sin(elapsed*2.2)*.09;
+      joints.Tail.rotation.z=basePose.Tail.z+
+        (hovering?0:Math.sin(elapsed*2.05)*.05);
     }
+    // Never distort the head during the wings' strong downstroke.
+    const frontWeight=1-profileOpacity;
+    const blend=1-Math.exp(-dt*5.4);
+    const yaw=motionDisabled?0:dx*(.09+.13*profileOpacity);
+    const roll=motionDisabled?0:(-dx*.07+beatPose.lean*.37);
+    const pitch=motionDisabled?-.02:(-.02-dy*.09);
+    bird.rotation.y+=(yaw-bird.rotation.y)*blend;
+    bird.rotation.z+=(roll-bird.rotation.z)*blend;
+    bird.rotation.x+=(pitch-bird.rotation.x)*blend;
     if(joints.Head&&basePose.Head){
-      joints.Head.rotation.y=basePose.Head.y+(motionDisabled?0:Math.sin(elapsed*1.4)*.06);
+      joints.Head.rotation.y=basePose.Head.y+
+        (motionDisabled?0:Math.sin(elapsed*1.1)*.025*frontWeight);
     }
-    // The approved artwork is a front-reference 3D relief: keep its finely
-    // textured frontal pose readable when banking instead of turning edge-on.
-    const yaw=motionDisabled?0:(dx*.29);
-    const roll=motionDisabled?0:(-dx*.17);
-    const pitch=motionDisabled?-.035:(-.035-dy*.13);
-    bird.rotation.y+=(yaw-bird.rotation.y)*smooth;
-    bird.rotation.z+=(roll-bird.rotation.z)*smooth;
-    bird.rotation.x+=(pitch-bird.rotation.x)*smooth;
   }
 
   function pointerMove(event){
@@ -263,10 +298,13 @@ if (holder) {
     if(!modelReady)return;
     const speed=norm(agent.vx,agent.vy);
     const lateral=Math.abs(agent.vx)/(speed+1);
-    const target=motionDisabled?0:
-      clamp((speed-28)/102,0,1)*clamp((lateral-.28)/.46,0,1);
-    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*4.8));
-    if(Math.abs(agent.vx)>20)horizontalFacing=agent.vx>0?1:-1;
+    const motion=smooth01((speed-12)/70);
+    const horizontal=smooth01((lateral-.30)/.48);
+    // Reference side-view keyframes only appear during directional flight.
+    // When slowing down, front-facing detailed feather maps win cleanly.
+    const target=motion*horizontal*beatPose.side;
+    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*10));
+    if(Math.abs(agent.vx)>22)horizontalFacing=agent.vx>0?1:-1;
     sidePose.setDirection(horizontalFacing);
     sidePose.setBlend(profileOpacity);
     for(const material of frontMaterials)material.opacity=1-profileOpacity;
@@ -293,10 +331,11 @@ if (holder) {
     }
     elapsed+=dt;
     updateMovement(dt,now);
-    updateFacing(dt);
     setPosition();
     if(renderer&&modelReady){
+      // The posed wings and the view blend must share the same reference frame.
       animateBird(dt);
+      updateFacing(dt);
       renderer.render(scene,camera);
     }
   }
