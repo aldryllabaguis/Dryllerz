@@ -31,7 +31,7 @@ if (holder) {
   bird.add(sidePose.root);
   sidePose.setBlend(0);
   const frontMaterials = new Set();
-  const camera = new THREE.OrthographicCamera(-3.6,3.6,3.6,-3.6,.1,50);
+  const camera = new THREE.OrthographicCamera(-3.05,3.05,3.05,-3.05,.1,50);
   camera.position.set(0,0,12);
   camera.lookAt(0,0,0);
   scene.add(new THREE.HemisphereLight(0xc7d3e0,0x121018,3.1));
@@ -52,7 +52,7 @@ if (holder) {
   let motionDisabled=reduceMotion.matches;
   let quietRendered=false;
   let hoverUntil=0;
-  let nextHoverAt=5.4+Math.random()*1.7;
+  let nextHoverAt=4.8+Math.random()*1.4;
   let profileOpacity=0;
   let horizontalFacing=1;
 
@@ -93,7 +93,7 @@ if (holder) {
       alpha:true,antialias:true,powerPreference:'high-performance'
     });
     renderer.setClearColor(0x000000,0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure=1.24;
@@ -116,11 +116,13 @@ if (holder) {
 
   function measure(){
     width=window.innerWidth;height=window.innerHeight;
-    size=clamp(width*(width<640?.38:.19),145,265);
+    // Previous 145–265px canvas made the detailed raven look like a tiny icon.
+    // Keep enough actual pixels for layered feathers to stay visible.
+    size=clamp(width*(width<640?.56:.285),190,415);
     const header=document.querySelector('.site-header');
     const headerHeight=header?.getBoundingClientRect().height||70;
-    const xPad=Math.min(width*.46,size*.48+12);
-    const yPad=Math.min(height*.35,size*.36+16);
+    const xPad=Math.min(width*.46,size*.43+10);
+    const yPad=Math.min(height*.35,size*.34+16);
     bounds={
       left:xPad,
       right:Math.max(xPad+1,width-xPad),
@@ -179,8 +181,8 @@ if (holder) {
     // Short, true hovering pauses make the front-facing pose visible without
     // abruptly stopping or teleporting the crow. The next glide is independent.
     if(elapsed>=nextHoverAt && (!lure || elapsed>=lure.until)){
-      hoverUntil=elapsed+1.35+Math.random()*.35;
-      nextHoverAt=elapsed+7.0+Math.random()*2.5;
+      hoverUntil=elapsed+1.6+Math.random()*.6;
+      nextHoverAt=elapsed+8.4+Math.random()*2.8;
     }
     if(elapsed<hoverUntil && (!lure || elapsed>=lure.until)){
       const damp=Math.exp(-dt*6.5);
@@ -232,7 +234,7 @@ if (holder) {
     const hovering=motionDisabled || elapsed<hoverUntil ||
       (speed<16 && (!lure || elapsed>=lure.until));
     const pose=sampleReferencePose(elapsed);
-    const intensity=hovering ? 0 : smooth01((speed-12)/58);
+    const intensity=hovering ? 0 : smooth01((speed-10)/60);
     // In a still hover the front reference remains open-winged, with barely
     // perceptible living motion; active flight follows the 8 reference frames.
     beatPose={
@@ -241,7 +243,7 @@ if (holder) {
       side: intensity*pose.side,
       lean: intensity*pose.lean
     };
-    const glide=(elapsed%6.4)>5.95? .75:0; // short, natural intermittent glide
+    const glide=(elapsed%7.8)>7.42? .55:0; // short intermittent glide, not a long frozen downstroke
     sidePose.flap(elapsed,beatPose.wing,glide);
     for(const side of [-1,1]){
       const name=side<0?'LeftWing':'RightWing';
@@ -298,13 +300,17 @@ if (holder) {
     if(!modelReady)return;
     const speed=norm(agent.vx,agent.vy);
     const lateral=Math.abs(agent.vx)/(speed+1);
-    const motion=smooth01((speed-12)/70);
-    const horizontal=smooth01((lateral-.30)/.48);
-    // Reference side-view keyframes only appear during directional flight.
-    // When slowing down, front-facing detailed feather maps win cleanly.
-    const target=motion*horizontal*beatPose.side;
-    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*10));
-    if(Math.abs(agent.vx)>22)horizontalFacing=agent.vx>0?1:-1;
+    // Critical fix: a wingbeat is 0.96s, but a bird's heading is NOT.
+    // Previous code multiplied the side view by a changing GIF keyframe,
+    // making the head rapidly flip between front and profile every beat.
+    // Heading now comes from actual motion and eases over ~250ms, independent
+    // of the wingbeat phase. The bird stays side-on while traveling sideways.
+    const moving=smooth01((speed-22)/85);
+    const sideways=smooth01((lateral-.23)/.53);
+    const target=motionDisabled||elapsed<hoverUntil?0:moving*sideways;
+    const ease=1-Math.exp(-dt*(target>profileOpacity?5.8:4.5));
+    profileOpacity+=(target-profileOpacity)*ease;
+    if(Math.abs(agent.vx)>25)horizontalFacing=agent.vx>0?1:-1;
     sidePose.setDirection(horizontalFacing);
     sidePose.setBlend(profileOpacity);
     for(const material of frontMaterials)material.opacity=1-profileOpacity;
