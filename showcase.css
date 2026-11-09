@@ -285,3 +285,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
   .timeline::after{transform:scaleY(1);box-shadow:none;will-change:auto}
   .timeline-dot{background:var(--accent);transition:none}
 }
+
+/* Keep dot geometry stationary during section fade-in so rail and markers never drift. */
+.has-js .timeline-item.reveal{transform:none;transition-property:opacity}
+.has-js .timeline-item.reveal.visible{transform:none}
