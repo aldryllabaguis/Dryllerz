@@ -1,9 +1,9 @@
 /**
  * Aldryl · Raven v3 — realistic crow geometry, actual independent 3D wings.
  *
- * Replaces the earlier hand-built crow. The GLB is a real corvid model with
- * articulated LeftWing / RightWing, Head, Tail, and Leg joints.
- * Asset: https://polyfork.dev/asset/crow-base  (free commercial-use GLB)
+ * Replaces the earlier hand-built crow. The GLB uses the approved detailed feather relief and
+ * articulated LeftWing / RightWing and Tail joints.
+ * Asset: assets/raven_hd_articulated.glb (portfolio-specific model generated from the approved raven preview)
  * Interaction dynamics are adapted from Nash's flying butterfly:
  * autonomous wandering target, anticipation, smooth steering, pointer
  * avoidance, click-to-approach, velocity banking.
