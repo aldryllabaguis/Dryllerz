@@ -13,7 +13,7 @@
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createRavenSidePose } from './raven-flight-pose.js?v=20261109-v7';
+import { createRavenSidePose } from './raven-flight-pose.js?v=20261109-gif-sync8';
 
 const holder = document.getElementById('aldryl-raven');
 if (holder) {
@@ -324,7 +324,12 @@ if (holder) {
         agent.y=clamp(height*.34,bounds.top,bounds.bottom);
         agent.vx=agent.vy=0;
         setPosition();
-        if(renderer&&modelReady)renderer.render(scene,camera);
+        if(renderer&&modelReady){
+          // Frame-accurate front-facing rest pose for reduced-motion visitors.
+          animateBird(1/60);
+          updateFacing(1/60);
+          renderer.render(scene,camera);
+        }
         quietRendered=true;
       }
       return;
