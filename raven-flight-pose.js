@@ -17,6 +17,59 @@ export function createRavenSidePose() {
     make(0x0b0e13,.1,.78), make(0x444f62,.24,.54)
   ];
   const [black,mid,edge,dark,shaft]=materials;
+  // Grayscale plumage map gives even the side-view geometry visible barbs,
+  // translucent feather edges and a narrow central rachis instead of
+  // featureless charcoal triangles. Drawn locally: no external downloads.
+  function buildFeatherMap(){
+    const canvas=document.createElement('canvas');
+    canvas.width=256;canvas.height=512;
+    const ctx=canvas.getContext('2d');
+    if(!ctx)return null;
+    const grad=ctx.createLinearGradient(0,0,256,0);
+    grad.addColorStop(0,'#aab0ba');
+    grad.addColorStop(.18,'#d5d9df');
+    grad.addColorStop(.50,'#c4cbd8');
+    grad.addColorStop(.78,'#e3e6ee');
+    grad.addColorStop(1,'#99a2af');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,256,512);
+    for(let i=0;i<132;i++){
+      const y=12+i*3.75;
+      const ripple=Math.sin(i*.31)*7;
+      ctx.beginPath();
+      ctx.moveTo(127,y);
+      ctx.quadraticCurveTo(78,y-10+ripple,4,y+8);
+      ctx.strokeStyle='rgba(24,30,40,.30)';
+      ctx.lineWidth=i%5===0?1.15:.58;ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(128,y);
+      ctx.quadraticCurveTo(182,y+9-ripple,252,y+3);
+      ctx.strokeStyle='rgba(34,39,51,.25)';
+      ctx.lineWidth=i%6===0?1.1:.55;ctx.stroke();
+    }
+    const shaftGrad=ctx.createLinearGradient(124,0,131,0);
+    shaftGrad.addColorStop(0,'rgba(20,25,33,.22)');
+    shaftGrad.addColorStop(.45,'rgba(252,253,255,.76)');
+    shaftGrad.addColorStop(1,'rgba(17,22,30,.25)');
+    ctx.fillStyle=shaftGrad;ctx.fillRect(124,6,7,500);
+    const map=new THREE.CanvasTexture(canvas);
+    map.colorSpace=THREE.SRGBColorSpace;
+    map.anisotropy=4;
+    map.needsUpdate=true;
+    return map;
+  }
+  const featherMap=buildFeatherMap();
+  const detailedFeathers=new Map();
+  if(featherMap){
+    for(const source of [black,mid,edge]){
+      const detailed=source.clone();
+      detailed.map=featherMap;
+      detailed.metalness=Math.min(.22,source.metalness+.04);
+      detailed.roughness=.67;
+      detailed.needsUpdate=true;
+      detailedFeathers.set(source,detailed);
+      materials.push(detailed);
+    }
+  }
   const mesh = (geometry,mat,parent=root) => {
     const item = new THREE.Mesh(geometry,mat);
     item.frustumCulled = false;
@@ -52,7 +105,7 @@ export function createRavenSidePose() {
     geo.setAttribute('position',new THREE.Float32BufferAttribute(points,3));
     geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
     geo.setIndex(faces);geo.computeVertexNormals();
-    mesh(geo,material,parent);
+    mesh(geo,detailedFeathers.get(material)||material,parent);
     if(vein){
       const dir=new THREE.Vector3(bx-ax,by-ay,bz-az);
       const p0=new THREE.Vector3(ax,ay,az+.024);
@@ -141,9 +194,22 @@ export function createRavenSidePose() {
       claw([[ox+.08,-1.06,.36],[ox+.12+f*.10,-1.17,.44],[ox+.16+f*.11,-1.21,.36]],.017);
     }
   }
-  root.scale.setScalar(1.00);
+  // Normalize the side pose to the exact displayed dimensions of the GLB.
+  // Before this, model scale jumped when front and side poses crossfaded.
+  const bounds=new THREE.Box3().setFromObject(root);
+  const actualSize=bounds.getSize(new THREE.Vector3());
+  const center=bounds.getCenter(new THREE.Vector3());
+  const fit=4.38/Math.max(actualSize.x,actualSize.y,actualSize.z,.001);
+  const contents=new THREE.Group();
+  for(const child of [...root.children])contents.add(child);
+  root.add(contents);
+  contents.position.copy(center).multiplyScalar(-1);
+  root.scale.setScalar(fit);
   let facing=1;
-  function setDirection(sign){facing=sign<0?-1:1;root.scale.x=facing;}
+  function setDirection(sign){
+    facing=sign<0?-1:1;
+    root.scale.x=facing*fit;
+  }
   function setBlend(amount){
     root.visible=amount>.004;
     for(const mat of materials)mat.opacity=amount;
@@ -155,9 +221,9 @@ export function createRavenSidePose() {
     const motion=THREE.MathUtils.clamp(pose,-1,1);
     const range=1-glide*.64;
     // Leading wing stays raised on the upstroke and folds smoothly on descent.
-    upperWing.rotation.z=.13+motion*.39*range;
-    upperWing.rotation.x=-.09+motion*.22*range;
-    upperWing.rotation.y=.04+motion*.18*range;
+    upperWing.rotation.z=.13+motion*.40*range;
+    upperWing.rotation.x=-.09+motion*.23*range;
+    upperWing.rotation.y=.04+motion*.19*range;
     // The nearer wing fans downward and twists its feathers on the downstroke.
     lowerWing.rotation.z=-.08-motion*.43*range;
     lowerWing.rotation.y=.05+motion*.34*range;
