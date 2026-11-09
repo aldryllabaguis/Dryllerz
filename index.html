@@ -13,7 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="showcase.css?v=20261109-journey-motion2">
+  <link rel="stylesheet" href="raven3d.css?v=20261109-raven1">
   <script defer src="showcase.js?v=20261109-journey-motion"></script>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
+  <script type="module" src="raven3d.js?v=20261109-raven1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -48,6 +51,19 @@
       <a href="#contact">Contact</a>
     </nav>
   </header>
+
+  <!-- Interactive 3D raven. Decorative and completely pointer-transparent. -->
+  <div id="aldryl-raven" class="raven-companion" aria-hidden="true">
+    <div class="raven-fallback">
+      <svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#202530" stroke="#393c47" stroke-width="1.5" d="M119 84 96 64 56 19 70 70 14 42 57 95 7 89 62 124 28 149 91 143 109 119 103 169 119 198 134 170 135 120 151 143 212 148 181 123 232 88 182 95 225 43 169 70 183 19 142 64Z"/>
+        <ellipse cx="120" cy="101" rx="31" ry="49" fill="#16191f"/>
+        <circle cx="120" cy="71" r="23" fill="#20232a"/>
+        <path d="M111 83 120 106 129 83Z" fill="#08080a"/>
+        <circle cx="112" cy="73" r="2.2" fill="#8b8e97"/><circle cx="128" cy="73" r="2.2" fill="#8b8e97"/>
+      </svg>
+    </div>
+  </div>
 
   <main id="main-content">
     <section class="hero" id="home" aria-labelledby="hero-title">
