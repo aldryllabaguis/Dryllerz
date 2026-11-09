@@ -148,14 +148,22 @@ export function createRavenSidePose() {
     root.visible=amount>.004;
     for(const mat of materials)mat.opacity=amount;
   }
-  function flap(t,phase,glide){
-    const motion=Math.sin(phase);
-    // A shallow roll around real shoulder joints; coverts remain connected.
-    upperWing.rotation.z=.08+motion*.31*(1-glide*.85);
-    upperWing.rotation.x=-.08+motion*.19*(1-glide*.80);
-    lowerWing.rotation.z=-.06-motion*.33*(1-glide*.85);
-    lowerWing.rotation.y=.08+motion*.30*(1-glide*.80);
-    tail.rotation.z=Math.sin(t*2.1)*.035;
+  function flap(t,pose,glide){
+    // 'pose' is the measured 8-frame raven reference wing position in [-1,1].
+    // This motion is no longer an unrelated sine wave: both 3D wings follow
+    // the same upstroke/downstroke beats as the approved 960ms GIF.
+    const motion=THREE.MathUtils.clamp(pose,-1,1);
+    const range=1-glide*.64;
+    // Leading wing stays raised on the upstroke and folds smoothly on descent.
+    upperWing.rotation.z=.13+motion*.39*range;
+    upperWing.rotation.x=-.09+motion*.22*range;
+    upperWing.rotation.y=.04+motion*.18*range;
+    // The nearer wing fans downward and twists its feathers on the downstroke.
+    lowerWing.rotation.z=-.08-motion*.43*range;
+    lowerWing.rotation.y=.05+motion*.34*range;
+    lowerWing.rotation.x=.03-motion*.13*range;
+    // The tail stabilizes the body, instead of flapping out of phase.
+    tail.rotation.z=Math.sin(t*2.1)*.030*(1-glide*.7);
   }
   return {root,setBlend,setDirection,flap};
 }
