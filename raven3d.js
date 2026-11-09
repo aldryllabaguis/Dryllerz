@@ -13,18 +13,12 @@
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createRavenSidePose } from './raven-flight-pose.js?v=20261109-v7';
 
 const holder = document.getElementById('aldryl-raven');
 if (holder) {
-  // The side-flight SVG follows the uploaded side-profile reference. The rigged
-  // 3D GLB remains the crisp front-facing pose whenever the raven hovers.
-  const flightProfile = document.createElement('img');
-  flightProfile.className = 'raven-side-flight';
-  flightProfile.src = 'raven-side-flight.svg?v=20261109-profile1';
-  flightProfile.alt = '';
-  flightProfile.setAttribute('aria-hidden','true');
-  flightProfile.decoding = 'async';
-  holder.appendChild(flightProfile);
+  // Both silhouettes now have real curved 3D volume. The front reference
+  // remains texture-detailed; the side has articulated layered feather fans.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = THREE.MathUtils.clamp;
   const norm = (x,y) => Math.hypot(x,y);
@@ -33,6 +27,10 @@ if (holder) {
   const bird = new THREE.Group();
   const scene = new THREE.Scene();
   scene.add(bird);
+  const sidePose = createRavenSidePose();
+  bird.add(sidePose.root);
+  sidePose.setBlend(0);
+  const frontMaterials = new Set();
   const camera = new THREE.OrthographicCamera(-3.6,3.6,3.6,-3.6,.1,50);
   camera.position.set(0,0,12);
   camera.lookAt(0,0,0);
@@ -203,13 +201,18 @@ if (holder) {
     // Ornithology-inspired: deliberate, asymmetric wingbeats with short gliding
     // intervals. Slightly faster than the earlier 3D preview (about 1.5 Hz).
     const cycle=(elapsed*1.72)%1;
-    const wave=Math.sin(cycle*Math.PI*2-.25);
+    const phase=cycle*Math.PI*2-.25;
+    const wave=Math.sin(phase);
     const asymmetric=wave>=0
       ? Math.pow(wave,.72)
       : -.84*Math.pow(-wave,1.22);
     const glideWindow=(elapsed%6.2)>5.6;
-    const amplitude=motionDisabled?0:(glideWindow?.14:.88);
+    // Glide cycles are brief and less forceful; the bird keeps its wings open
+    // instead of snapping them shut. The same 1.72 Hz phase drives both rigs.
+    const glideFactor=glideWindow?1:0;
+    const amplitude=motionDisabled?0:(glideWindow?.12:.91);
     const beat=asymmetric*amplitude;
+    sidePose.flap(elapsed,phase,glideFactor);
     for(const side of [-1,1]){
       const part=joints[side===-1?'LeftWing':'RightWing'];
       const base=basePose[side===-1?'LeftWing':'RightWing'];
@@ -226,9 +229,9 @@ if (holder) {
     }
     // The approved artwork is a front-reference 3D relief: keep its finely
     // textured frontal pose readable when banking instead of turning edge-on.
-    const yaw=motionDisabled?-.10:(-.10+dx*.37);
-    const roll=motionDisabled?0:(-dx*.18);
-    const pitch=motionDisabled?-.06:(-.06-dy*.17);
+    const yaw=motionDisabled?0:(dx*.29);
+    const roll=motionDisabled?0:(-dx*.17);
+    const pitch=motionDisabled?-.035:(-.035-dy*.13);
     bird.rotation.y+=(yaw-bird.rotation.y)*smooth;
     bird.rotation.z+=(roll-bird.rotation.z)*smooth;
     bird.rotation.x+=(pitch-bird.rotation.x)*smooth;
@@ -253,22 +256,20 @@ if (holder) {
     nextHoverAt=Math.max(nextHoverAt,elapsed+5.7);
   }
 
-  // Smoothly crossfade between the 3D frontal crow and its high-detail
-  // side-flight reference whenever horizontal travel is decisive. Heading
-  // reversal mirrors the side pose; vertical flight favors the 3D front.
+  // Blend between TWO genuine 3D representations. When hovering or turning
+  // vertically, detailed frontal feathers take over; horizontal travel brings
+  // out the volumetric side sculpture. No flat SVG is used in flight.
   function updateFacing(dt){
+    if(!modelReady)return;
     const speed=norm(agent.vx,agent.vy);
     const lateral=Math.abs(agent.vx)/(speed+1);
-    const target=motionDisabled ? 0 :
-      clamp((speed-32)/105,0,1)*clamp((lateral-.31)/.48,0,1);
-    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*5.2));
-    if(Math.abs(agent.vx)>22)horizontalFacing=agent.vx>0?1:-1;
-    const wingPhase=Math.sin(elapsed*Math.PI*2*1.72);
-    const bank=motionDisabled?0:clamp(-agent.vy/260,-1,1)*6.4;
-    const stretch=motionDisabled?1:1+.055*wingPhase;
-    flightProfile.style.opacity=profileOpacity.toFixed(3);
-    flightProfile.style.transform='scaleX('+horizontalFacing+') rotate('+bank.toFixed(2)+'deg) scaleY('+stretch.toFixed(3)+')';
-    if(renderer)renderer.domElement.style.opacity=(modelReady?1-profileOpacity:0).toFixed(3);
+    const target=motionDisabled?0:
+      clamp((speed-28)/102,0,1)*clamp((lateral-.28)/.46,0,1);
+    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*4.8));
+    if(Math.abs(agent.vx)>20)horizontalFacing=agent.vx>0?1:-1;
+    sidePose.setDirection(horizontalFacing);
+    sidePose.setBlend(profileOpacity);
+    for(const material of frontMaterials)material.opacity=1-profileOpacity;
   }
 
   // All parts remain in the viewport as a smooth moving overlay, while the
@@ -323,7 +324,8 @@ if (holder) {
             basePose[name]={x:joint.rotation.x,y:joint.rotation.y,z:joint.rotation.z};
           }
         }
-        // Preserve PBR texturing; catch direct material glitches gracefully.
+        // Preserve the approved high-resolution feather maps. Make front
+        // surfaces capable of a transparent crossfade into the 3D side rig.
         crow.traverse(obj=>{
           if(!obj.isMesh)return;
           obj.castShadow=false;
@@ -333,6 +335,10 @@ if (holder) {
             if(!mat)return;
             if('roughness' in mat)mat.roughness=.68;
             if('metalness' in mat)mat.metalness=Math.min(.22,mat.metalness||0);
+            mat.transparent=true;
+            mat.depthWrite=false;
+            mat.opacity=1;
+            frontMaterials.add(mat);
             mat.needsUpdate=true;
           });
         });
@@ -359,7 +365,8 @@ if (holder) {
   const onMotionChange=()=>{
     motionDisabled=reduceMotion.matches;
     profileOpacity=0;
-    flightProfile.style.opacity='0';
+    sidePose.setBlend(0);
+    for(const material of frontMaterials)material.opacity=1;
     if(renderer)renderer.domElement.style.opacity=modelReady?'1':'0';
     quietRendered=false;
     last=performance.now();
