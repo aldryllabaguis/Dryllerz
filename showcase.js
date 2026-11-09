@@ -82,7 +82,7 @@ if ($('projects')) {
 
 if ($('experience-list')) {
   $('experience-list').innerHTML=journey.map(item=>
-    '<article class="timeline-item reveal"><span class="timeline-year">'+escapeHTML(item.year)+'</span><div>'+
+    '<article class="timeline-item reveal"><span class="timeline-dot" aria-hidden="true"></span><span class="timeline-year">'+escapeHTML(item.year)+'</span><div>'+
     '<h3>'+escapeHTML(item.name)+'</h3><h4>'+escapeHTML(item.where)+'</h4>'+
     '<ul>'+item.bullets.map(bullet=>'<li>'+escapeHTML(bullet)+'</li>').join('')+'</ul>'+
     chipList(item.tags)+'</div></article>'
@@ -217,3 +217,42 @@ document.querySelectorAll('[data-doc]').forEach(async el=>{
   }catch(error){/* Placeholder remains informative when docs aren't uploaded. */}
 });
 
+
+
+/* Same scroll-mapped rail used in the main JRU portfolio:
+   38% viewport reading line, no trailing easing on scroll or reverse scroll.
+   Markers are measured in real screen coordinates so the red beam and dots agree. */
+const journeyRail=$('experience-list');
+const journeyMarkers=journeyRail
+  ? [...journeyRail.querySelectorAll('.timeline-item')]
+      .map(item=>({item,dot:item.querySelector('.timeline-dot')}))
+      .filter(marker=>marker.dot)
+  : [];
+let journeyFramePending=false;
+function updateJourneyProgress(){
+  journeyFramePending=false;
+  if(!journeyRail||!motionOK)return;
+  const rail=journeyRail.getBoundingClientRect();
+  if(rail.height<=0)return;
+  const readingY=window.innerHeight*.38;
+  const filled=Math.max(0,Math.min(rail.height,readingY-rail.top));
+  journeyRail.style.setProperty('--timeline-progress',(filled/rail.height).toFixed(5));
+  const beamEndY=rail.top+filled;
+  journeyMarkers.forEach(({item,dot})=>{
+    const rect=dot.getBoundingClientRect();
+    item.classList.toggle('is-passed',rect.top+rect.height/2<=beamEndY);
+  });
+}
+function scheduleJourneyProgress(){
+  if(!journeyFramePending){
+    journeyFramePending=true;
+    requestAnimationFrame(updateJourneyProgress);
+  }
+}
+if(journeyRail&&motionOK){
+  window.addEventListener('scroll',scheduleJourneyProgress,{passive:true});
+  window.addEventListener('resize',scheduleJourneyProgress);
+  window.addEventListener('load',scheduleJourneyProgress,{once:true});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleJourneyProgress);
+  scheduleJourneyProgress();
+}
