@@ -202,7 +202,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
   html{scroll-padding-top:85px}.container{width:calc(100% - 36px)}
   .nav-inner{height:70px}.mobile-nav{top:70px}.brand{font-size:18px}.brand-mark{width:36px;height:36px}
   .hero{padding:60px 0 75px}.hero-inner{gap:20px;min-height:auto}
-  .hero-title,.hero-title .last-name{font-size:clamp(62px,15vw,94px);letter-spacing:-.09em}
+  .hero-title,.hero-title .last-name{font-size:clamp(44px,14.1vw,94px);letter-spacing:-.09em}
   .hero-title{margin:25px 0}.hero-lead{font-size:23px}.hero-desc{font-size:13px}
   .hero-scroll{margin-top:38px}.hero-buttons .btn{min-height:50px;padding:12px 15px;font-size:11px}
   .visual{min-height:340px;padding:10px 8px}.editor{transform:rotate(-2deg)}
