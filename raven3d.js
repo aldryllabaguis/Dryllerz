@@ -16,6 +16,15 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const holder = document.getElementById('aldryl-raven');
 if (holder) {
+  // The side-flight SVG follows the uploaded side-profile reference. The rigged
+  // 3D GLB remains the crisp front-facing pose whenever the raven hovers.
+  const flightProfile = document.createElement('img');
+  flightProfile.className = 'raven-side-flight';
+  flightProfile.src = 'raven-side-flight.svg?v=20261109-profile1';
+  flightProfile.alt = '';
+  flightProfile.setAttribute('aria-hidden','true');
+  flightProfile.decoding = 'async';
+  holder.appendChild(flightProfile);
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = THREE.MathUtils.clamp;
   const norm = (x,y) => Math.hypot(x,y);
@@ -44,6 +53,10 @@ if (holder) {
   const basePose={};
   let motionDisabled=reduceMotion.matches;
   let quietRendered=false;
+  let hoverUntil=0;
+  let nextHoverAt=5.4+Math.random()*1.7;
+  let profileOpacity=0;
+  let horizontalFacing=1;
 
   try {
     renderer = new THREE.WebGLRenderer({
@@ -133,6 +146,21 @@ if (holder) {
   }
 
   function updateMovement(dt,now){
+    // Short, true hovering pauses make the front-facing pose visible without
+    // abruptly stopping or teleporting the crow. The next glide is independent.
+    if(elapsed>=nextHoverAt && (!lure || elapsed>=lure.until)){
+      hoverUntil=elapsed+1.35+Math.random()*.35;
+      nextHoverAt=elapsed+7.0+Math.random()*2.5;
+    }
+    if(elapsed<hoverUntil && (!lure || elapsed>=lure.until)){
+      const damp=Math.exp(-dt*6.5);
+      agent.vx*=damp;
+      agent.vy*=damp;
+      agent.x+=agent.vx*dt;
+      agent.y+=agent.vy*dt;
+      stayInside(agent);
+      return;
+    }
     const speed=clamp(width*.19,125,315);
     const wanderSpeed=clamp(width*.105,83,185);
     const accel=clamp(width*.5,270,760);
@@ -174,12 +202,12 @@ if (holder) {
     const smooth=1-Math.exp(-dt*4.6);
     // Ornithology-inspired: deliberate, asymmetric wingbeats with short gliding
     // intervals. Slightly faster than the earlier 3D preview (about 1.5 Hz).
-    const cycle=(elapsed*1.52)%1;
+    const cycle=(elapsed*1.72)%1;
     const wave=Math.sin(cycle*Math.PI*2-.25);
     const asymmetric=wave>=0
       ? Math.pow(wave,.72)
       : -.84*Math.pow(-wave,1.22);
-    const glideWindow=(elapsed%5.7)>4.6;
+    const glideWindow=(elapsed%6.2)>5.6;
     const amplitude=motionDisabled?0:(glideWindow?.14:.88);
     const beat=asymmetric*amplitude;
     for(const side of [-1,1]){
@@ -198,9 +226,9 @@ if (holder) {
     }
     // The approved artwork is a front-reference 3D relief: keep its finely
     // textured frontal pose readable when banking instead of turning edge-on.
-    const yaw=motionDisabled?-.10:(-.10+dx*.15);
-    const roll=motionDisabled?0:(-dx*.11);
-    const pitch=motionDisabled?-.06:(-.06-dy*.08);
+    const yaw=motionDisabled?-.10:(-.10+dx*.37);
+    const roll=motionDisabled?0:(-dx*.18);
+    const pitch=motionDisabled?-.06:(-.06-dy*.17);
     bird.rotation.y+=(yaw-bird.rotation.y)*smooth;
     bird.rotation.z+=(roll-bird.rotation.z)*smooth;
     bird.rotation.x+=(pitch-bird.rotation.x)*smooth;
@@ -221,6 +249,26 @@ if (holder) {
       y:clamp(event.clientY,bounds.top,bounds.bottom),
       until:elapsed+3.5
     };
+    hoverUntil=0;
+    nextHoverAt=Math.max(nextHoverAt,elapsed+5.7);
+  }
+
+  // Smoothly crossfade between the 3D frontal crow and its high-detail
+  // side-flight reference whenever horizontal travel is decisive. Heading
+  // reversal mirrors the side pose; vertical flight favors the 3D front.
+  function updateFacing(dt){
+    const speed=norm(agent.vx,agent.vy);
+    const lateral=Math.abs(agent.vx)/(speed+1);
+    const target=motionDisabled ? 0 :
+      clamp((speed-32)/105,0,1)*clamp((lateral-.31)/.48,0,1);
+    profileOpacity+=(target-profileOpacity)*(1-Math.exp(-dt*5.2));
+    if(Math.abs(agent.vx)>22)horizontalFacing=agent.vx>0?1:-1;
+    const wingPhase=Math.sin(elapsed*Math.PI*2*1.72);
+    const bank=motionDisabled?0:clamp(-agent.vy/260,-1,1)*6.4;
+    const stretch=motionDisabled?1:1+.055*wingPhase;
+    flightProfile.style.opacity=profileOpacity.toFixed(3);
+    flightProfile.style.transform='scaleX('+horizontalFacing+') rotate('+bank.toFixed(2)+'deg) scaleY('+stretch.toFixed(3)+')';
+    if(renderer)renderer.domElement.style.opacity=(modelReady?1-profileOpacity:0).toFixed(3);
   }
 
   // All parts remain in the viewport as a smooth moving overlay, while the
@@ -244,6 +292,7 @@ if (holder) {
     }
     elapsed+=dt;
     updateMovement(dt,now);
+    updateFacing(dt);
     setPosition();
     if(renderer&&modelReady){
       animateBird(dt);
@@ -309,6 +358,9 @@ if (holder) {
   document.addEventListener('click',attractOnClick,{passive:true});
   const onMotionChange=()=>{
     motionDisabled=reduceMotion.matches;
+    profileOpacity=0;
+    flightProfile.style.opacity='0';
+    if(renderer)renderer.domElement.style.opacity=modelReady?'1':'0';
     quietRendered=false;
     last=performance.now();
     if(!motionDisabled)chooseGoal();
