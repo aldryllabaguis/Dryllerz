@@ -53,7 +53,7 @@ if (holder) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.53;
+    renderer.toneMappingExposure=1.24;
     renderer.domElement.setAttribute('aria-hidden','true');
     holder.appendChild(renderer.domElement);
   } catch(err) {
@@ -172,14 +172,23 @@ if (holder) {
     const dx=speed>1?agent.vx/speed:0;
     const dy=speed>1?agent.vy/speed:0;
     const smooth=1-Math.exp(-dt*4.6);
-    const beat=motionDisabled?0:Math.sin(elapsed*11.8)*.50;
+    // Ornithology-inspired: deliberate, asymmetric wingbeats with short gliding
+    // intervals. Slightly faster than the earlier 3D preview (about 1.5 Hz).
+    const cycle=(elapsed*1.52)%1;
+    const wave=Math.sin(cycle*Math.PI*2-.25);
+    const asymmetric=wave>=0
+      ? Math.pow(wave,.72)
+      : -.84*Math.pow(-wave,1.22);
+    const glideWindow=(elapsed%5.7)>4.6;
+    const amplitude=motionDisabled?0:(glideWindow?.14:.88);
+    const beat=asymmetric*amplitude;
     for(const side of [-1,1]){
       const part=joints[side===-1?'LeftWing':'RightWing'];
       const base=basePose[side===-1?'LeftWing':'RightWing'];
       if(!part||!base)continue;
-      part.rotation.z=base.z+side*(.33+beat*.46);
-      part.rotation.x=base.x+beat*.11;
-      part.rotation.y=base.y+side*(.22+beat*.24);
+      part.rotation.z=base.z+side*(.08+beat*.28);
+      part.rotation.y=base.y+side*(.12+beat*.50);
+      part.rotation.x=base.x+beat*.065;
     }
     if(joints.Tail&&basePose.Tail){
       joints.Tail.rotation.z=basePose.Tail.z+Math.sin(elapsed*2.2)*.09;
@@ -187,9 +196,11 @@ if (holder) {
     if(joints.Head&&basePose.Head){
       joints.Head.rotation.y=basePose.Head.y+(motionDisabled?0:Math.sin(elapsed*1.4)*.06);
     }
-    const yaw=motionDisabled?-.30:(-.30+dx*.52);
-    const roll=motionDisabled?-.06:(-dx*.37);
-    const pitch=motionDisabled?-.26:(-.26-dy*.29);
+    // The approved artwork is a front-reference 3D relief: keep its finely
+    // textured frontal pose readable when banking instead of turning edge-on.
+    const yaw=motionDisabled?-.10:(-.10+dx*.15);
+    const roll=motionDisabled?0:(-dx*.11);
+    const pitch=motionDisabled?-.06:(-.06-dy*.08);
     bird.rotation.y+=(yaw-bird.rotation.y)*smooth;
     bird.rotation.z+=(roll-bird.rotation.z)*smooth;
     bird.rotation.x+=(pitch-bird.rotation.x)*smooth;
@@ -243,7 +254,7 @@ if (holder) {
   function loadCrow(){
     if(!renderer)return;
     new GLTFLoader().load(
-      'https://polyfork.dev/cdn/crow-base.glb',
+      'assets/raven_hd_articulated.glb?v=20261109-v5',
       (gltf)=>{
         if(disposed)return;
         crow=gltf.scene;
@@ -252,7 +263,7 @@ if (holder) {
         const center=bounds3d.getCenter(new THREE.Vector3());
         if(!sz.length()||!Number.isFinite(sz.length()))return;
         // A true GLB rather than a flat billboard. Scale to the canvas.
-        const unit=4.6/Math.max(sz.x,sz.y,sz.z,.001);
+        const unit=4.55/Math.max(sz.x,sz.y,sz.z,.001);
         crow.scale.setScalar(unit);
         crow.position.copy(center).multiplyScalar(-unit);
         bird.add(crow);
