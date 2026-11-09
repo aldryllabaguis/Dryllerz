@@ -111,7 +111,7 @@ function applyTheme(){
     themeButton.setAttribute('title',theme==='dark'?'Light mode':'Dark mode');
   }
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta)meta.setAttribute('content',theme==='dark'?'#090e12':'#f6f8f3');
+  if(meta)meta.setAttribute('content',theme==='dark'?'#08080a':'#f3f1ea');
 }
 applyTheme();
 if(themeButton)themeButton.addEventListener('click',()=>{
