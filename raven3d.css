@@ -1,0 +1,51 @@
+/* 3D raven companion — follows Nash's interaction design, preserving page controls. */
+.raven-companion{
+  position:fixed;
+  top:0;
+  left:0;
+  width:230px;
+  height:230px;
+  z-index:60; /* below the site header; above content; never blocks pointer input */
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+  transform:translate3d(62vw,40vh,0);
+  transition:opacity .45s ease,visibility .45s ease;
+  contain:layout style;
+  filter:drop-shadow(0 14px 16px rgba(0,0,0,.23)) drop-shadow(0 0 14px rgba(255,59,29,.14));
+}
+.raven-companion.is-visible{
+  opacity:1;
+  visibility:visible;
+}
+.raven-companion canvas,
+.raven-companion .raven-fallback{
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+.raven-companion canvas{z-index:2}
+.raven-companion .raven-fallback{
+  z-index:1;
+  display:grid;
+  place-items:center;
+  opacity:.5;
+}
+.raven-companion .raven-fallback svg{
+  display:block;
+  width:87%;
+  height:87%;
+  filter:drop-shadow(0 0 9px rgba(255,59,29,.18));
+}
+.raven-companion.is-rendered .raven-fallback{opacity:0}
+@media (max-width:660px){
+  .raven-companion{
+    filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .raven-companion{transition:none;filter:none}
+}
