@@ -412,5 +412,23 @@ if (mount) {
         if(object.geometry)object.geometry.dispose();
       });
     },{once:true});
+  } else {
+    // If WebGL is blocked, retain the SVG raven in the same two sections.
+    const fallbackPosition=()=>{
+      const h=window.innerHeight;
+      const active=targets.some(section=>{
+        const bounds=section.getBoundingClientRect();
+        return bounds.top<h*.48&&bounds.bottom>h*.48;
+      });
+      mount.classList.toggle('is-visible',active);
+      const size=Math.min(220,Math.max(130,window.innerWidth*.3));
+      mount.style.width=size+'px';
+      mount.style.height=size+'px';
+      mount.style.transform='translate3d('+(window.innerWidth*.72-size/2)+'px,'+
+        (window.innerHeight*.4-size/2)+'px,0)';
+    };
+    window.addEventListener('scroll',fallbackPosition,{passive:true});
+    window.addEventListener('resize',fallbackPosition,{passive:true});
+    fallbackPosition();
   }
 }
