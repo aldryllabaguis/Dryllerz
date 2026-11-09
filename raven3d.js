@@ -43,6 +43,7 @@ if (holder) {
   let frame=0,disposed=false,modelReady=false;
   const basePose={};
   let motionDisabled=reduceMotion.matches;
+  let quietRendered=false;
 
   try {
     renderer = new THREE.WebGLRenderer({
@@ -90,6 +91,7 @@ if (holder) {
     holder.style.width=size+'px';
     holder.style.height=size+'px';
     if(renderer)renderer.setSize(size,size,false);
+    quietRendered=false;
     setPosition();
   }
 
@@ -219,11 +221,14 @@ if (holder) {
     last=now;
     if(document.hidden)return;
     if(motionDisabled){
-      agent.x=clamp(width*.73,bounds.left,bounds.right);
-      agent.y=clamp(height*.34,bounds.top,bounds.bottom);
-      agent.vx=agent.vy=0;
-      setPosition();
-      if(renderer&&modelReady)renderer.render(scene,camera);
+      if(!quietRendered){
+        agent.x=clamp(width*.73,bounds.left,bounds.right);
+        agent.y=clamp(height*.34,bounds.top,bounds.bottom);
+        agent.vx=agent.vy=0;
+        setPosition();
+        if(renderer&&modelReady)renderer.render(scene,camera);
+        quietRendered=true;
+      }
       return;
     }
     elapsed+=dt;
@@ -247,9 +252,9 @@ if (holder) {
         const center=bounds3d.getCenter(new THREE.Vector3());
         if(!sz.length()||!Number.isFinite(sz.length()))return;
         // A true GLB rather than a flat billboard. Scale to the canvas.
-        crow.position.sub(center);
         const unit=4.6/Math.max(sz.x,sz.y,sz.z,.001);
         crow.scale.setScalar(unit);
+        crow.position.copy(center).multiplyScalar(-unit);
         bird.add(crow);
         for(const name of ['LeftWing','RightWing','Head','Tail']){
           const joint=crow.getObjectByName(name);
@@ -272,6 +277,7 @@ if (holder) {
           });
         });
         modelReady=true;
+        quietRendered=false;
         holder.classList.add('model-loaded');
         animateBird(.016);
         renderer.render(scene,camera);
@@ -292,6 +298,7 @@ if (holder) {
   document.addEventListener('click',attractOnClick,{passive:true});
   const onMotionChange=()=>{
     motionDisabled=reduceMotion.matches;
+    quietRendered=false;
     last=performance.now();
     if(!motionDisabled)chooseGoal();
   };
