@@ -12,7 +12,7 @@
   transform:translate3d(62vw,40vh,0);
   transition:opacity .45s ease,visibility .45s ease;
   contain:layout style;
-  filter:drop-shadow(0 14px 16px rgba(0,0,0,.23)) drop-shadow(0 0 14px rgba(255,59,29,.14));
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.36));
 }
 .raven-companion.is-visible{
   opacity:1;
@@ -40,7 +40,7 @@
   height:87%;
   filter:drop-shadow(0 0 9px rgba(255,59,29,.18));
 }
-.raven-companion.is-rendered .raven-fallback{opacity:0}
+.raven-companion.model-loaded .raven-fallback{opacity:0}
 @media (max-width:660px){
   .raven-companion{
     filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));
@@ -49,3 +49,15 @@
 @media (prefers-reduced-motion:reduce){
   .raven-companion{transition:none;filter:none}
 }
+
+
+/* Real-asset staging: the reference-matched corvid silhouette stays until
+   the articulated GLB successfully loads. Never show a placeholder X-shape. */
+.raven-companion .raven-fallback{
+  opacity:1;
+  transition:opacity .3s ease;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.27));
+}
+.raven-companion.model-loaded .raven-fallback{opacity:0}
+.raven-companion canvas{opacity:0;transition:opacity .3s ease}
+.raven-companion.model-loaded canvas{opacity:1}
