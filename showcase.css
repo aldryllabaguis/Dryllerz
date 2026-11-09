@@ -175,7 +175,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .footer-inner p{font-size:11px;color:var(--faint);margin:0}
 .footer-caps{font-size:10px;color:var(--faint);letter-spacing:.08em}
 .back-to-top{border:0;background:transparent;color:var(--accent);font:11px "JetBrains Mono",monospace}
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+.reveal{opacity:1;transform:none;transition:opacity .75s ease,transform .75s ease}
+.has-js .reveal{opacity:0;transform:translateY(28px)}
 .reveal.visible{opacity:1;transform:translateY(0)}
 @media(max-width:1080px){
   .desktop-nav{gap:17px}.hero-inner{gap:27px}.floating-note{right:-8px}.container{width:min(1180px,calc(100% - 46px))}
